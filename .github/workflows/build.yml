@@ -33,10 +33,18 @@ jobs:
           ncc build -o build/lib ./index.js
           pkg --targets node18-${{ matrix.os }} -o build/lynx-${{ matrix.os }} ./build/lib/index.js
 
+  push-builds:
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Set up Git
         run: |
-          git config --global user.name "Your Name"
-          git config --global user.email "youremail@example.com"
+          git config --global user.name "Lynx Bot"
+          git config --global user.email "info@getlynx.dev"
 
       - name: Get package version
         id: get-version
@@ -47,16 +55,8 @@ jobs:
           mkdir -p build/${{ steps.get-version.outputs.version }}
           mv build/lynx-* build/${{ steps.get-version.outputs.version }}/
 
-      - name: Push Builds
-        uses: github-actions-x/commit@v2.9
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: 'dev' # Change to the current target branch (main)
-          commit-message: 'Publish Builds' # Customize the commit message
-          force-add: 'true'
-          files: |
-            build/linux-x64/
-            build/macos-x64/
-            build/windows-x64/
-          name: 'Lynx Bot' # Customize the committer's name
-          email: 'info@lynx.dev' # Customize the committer's email
+      - name: Commit and push versioned binaries
+        run: |
+          git add build/
+          git commit -m "Add versioned binaries for ${{ steps.get-version.outputs.version }}"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
