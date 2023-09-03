@@ -88,6 +88,56 @@ program
         }
     });
 
+/*
+|----------------------------------------------------------------------------------
+| Account Commands
+|----------------------------------------------------------------------------------
+ */
+
+// Define the "account" command
+program
+    .command('account <action>')
+    .description('Perform account actions')
+    .action(async (action) => {
+        const apiUrl = config.apiUrl; // API URL
+        const secret = config.apiKey; // API Key
+
+        const headers = {
+            'secret': secret, // Set the header name for authorization
+            'Authorization': config.apiKey, // Set the API Key from the configuration file
+        };
+
+        switch (action) {
+            case 'get':
+                try {
+                    const response = await axios.get(`${apiUrl}/auth/me`, { headers });
+                    if (response.status === 200) {
+                        const accountInfo = response.data.result;
+                        console.log('Account Information:');
+                        console.log(`ID: ${accountInfo.id}`);
+                        console.log(`Username: ${accountInfo.username}`);
+                        console.log(`Email: ${accountInfo.email}`);
+                        console.log(`Role: ${accountInfo.role}`);
+                        console.log(`2FA Enabled: ${accountInfo.totp}`);
+                    } else {
+                        console.error('Failed to fetch account information:', response.status);
+                    }
+                } catch (error) {
+                    console.error('An error occurred:', error.message);
+                }
+                break;
+
+            default:
+                console.error('Invalid action. Use "get"');
+        }
+    });
+
+/*
+|----------------------------------------------------------------------------------
+| s
+|----------------------------------------------------------------------------------
+ */
+
 program
     .configureOutput({
         // Custom text for listing commands
