@@ -155,11 +155,10 @@ program
 
 // Create a link
 program
-    .command('create <slug> <destination>')
+    .command('create <url>')
     .description('Create a new link')
-    .requiredOption('-a, --author <author>', 'Author ID')
-    .action(async (slug, destination, options) => {
-        if (slug && destination) {
+    .action(async (url) => {
+        if (url) {
             const apiUrl = config.apiUrl; // Assuming you have already configured the API URL
             const secret = config.apiKey; // Assuming you have the API key in config.apiKey
 
@@ -169,24 +168,15 @@ program
             };
 
             const data = {
-                slug,
-                destination,
-                author: options.author,
+                secret: config.apiKey,
+                url: url,
             };
 
             try {
-                const response = await axios.post(`${apiUrl}/link`, data, { headers });
+                const response = await axios.post(`${apiUrl}/sharex`, data, { headers });
                 if (response.status === 200) {
-                    const linkInfo = response.data.result;
-                    console.log('Link Successfully Created:');
-                    console.log(`ID: ${linkInfo.id}`);
-                    console.log(`Slug: ${linkInfo.slug}`);
-                    console.log(`Destination: ${linkInfo.destination}`);
-                    console.log(`Author: ${linkInfo.author}`);
-                    console.log(`Creation Date: ${linkInfo.creationDate}`);
-                    console.log(`Modified Date: ${linkInfo.modifiedDate}`);
-                    console.log(`Visits: ${linkInfo.visits}`);
-                    console.log(`Account: ${linkInfo.account}`);
+                    console.log('Link Successfully Created!');
+                    console.log(`Destination: ${url}`);
                 } else if (response.status === 401) {
                     console.error('Unauthorized:', response.status);
                 } else if (response.status === 409) {
