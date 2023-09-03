@@ -1,0 +1,21 @@
+{
+  "name": "lynx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ncc build  -o build/lib ./index.js && pkg --targets node18-linux-x64,node18-win-x64,node18-macos-x64 -o build/discordextras ./build/lib/index.js"
+  },
+  "keywords": [],
+  "author": "Supernova3339",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.22.10",
+    "@babel/preset-env": "^7.22.10",
+    "axios": "^1.4.0",
+    "commander": "^11.0.0",
+    "fs": "^0.0.1-security",
+    "pkg": "^5.8.1"
+  }
+}
