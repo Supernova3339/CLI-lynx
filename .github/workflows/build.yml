@@ -1,0 +1,34 @@
+name: Build Lynx
+
+on:
+  push:
+    branches:
+      - dev # You can change this to your main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16 # Adjust the Node.js version if needed (16 preferred)
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install ncc and pkg
+        run: npm install -g @vercel/ncc pkg
+
+      - name: Build Lynx for ${{ matrix.os }}
+        run: |
+          ncc build -o build/lib ./index.js
+          pkg --targets node18-${{ matrix.os }} -o build/lynx-${{ matrix.os }} ./build/lib/index.js
