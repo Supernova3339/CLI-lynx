@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-x64, windows-x64, linux-x64]
 
     steps:
       - name: Checkout code
