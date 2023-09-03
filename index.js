@@ -1,6 +1,8 @@
 const fs = require('fs');
 const { program } = require('commander');
 const packageJson = require('./package.json');
+const {get} = require("axios");
+const axios = require("axios");
 
 // Check if config.json exists, and if not, create it with blank values
 if (!fs.existsSync('config.json')) {
@@ -50,6 +52,41 @@ program
 
         fs.writeFileSync('config.json', JSON.stringify(defaultConfig, null, 2));
         console.log('Configuration reset.');
+    });
+
+program
+    .command('about')
+    .description('About Your Lynx Instance')
+    .action(async () => {
+        const apiUrl = config.apiUrl; // Assuming you have already configured the API URL
+        const secret = config.apiKey; // Assuming you have the API key in config.apiKey
+
+        const headers = {
+            'secret': secret, // Set the header name for authorization
+            'Authorization': config.apiKey, // Set the API Key from the configuration file
+        };
+
+        try {
+            const response = await axios.get(`${apiUrl}/about`, { headers });
+            if (response.status === 200) {
+                const result = response.data.result;
+                console.log('About Your Lynx Instance:');
+                console.log(`Domain: ${result.domain}`);
+                console.log(`Demo: ${result.demo}`);
+                console.log(`Version: ${result.version}`);
+                console.log(`Accounts: ${result.accounts}`);
+
+                if (result.umami) {
+                    console.log('Umami:');
+                    console.log(`  Site: ${result.umami.site}`);
+                    console.log(`  URL: ${result.umami.url}`);
+                }
+            } else {
+                console.error('Failed to fetch about information:', response.status);
+            }
+        } catch (error) {
+            console.error('An error occurred:', error.message);
+        }
     });
 
 program
