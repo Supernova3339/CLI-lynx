@@ -1,7 +1,6 @@
 const fs = require('fs');
 const { program } = require('commander');
 const packageJson = require('./package.json');
-const {get} = require("axios");
 const axios = require("axios");
 
 // Check if config.json exists, and if not, create it with blank values
