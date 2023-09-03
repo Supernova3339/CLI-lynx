@@ -50,9 +50,11 @@ jobs:
         id: get-version
         run: echo ::set-output name=version::$(node -e "console.log(require('./package.json').version)")
 
+      - name: Create versioned directory if not exists
+        run: mkdir -p build/${{ steps.get-version.outputs.version }}
+
       - name: Move built binaries to versioned directory
         run: |
-          mkdir -p build/${{ steps.get-version.outputs.version }}
           mv build/lynx-* build/${{ steps.get-version.outputs.version }}/
 
       - name: Commit and push versioned binaries
