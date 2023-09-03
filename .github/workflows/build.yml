@@ -55,7 +55,7 @@ jobs:
 
       - name: Move built binaries to versioned directory
         run: |
-          mv build/lynx-* build/${{ steps.get-version.outputs.version }}/
+          mv build/lynx-* build/${{ steps.get-version.outputs.version }}/ || true
 
       - name: Commit and push versioned binaries
         run: |
