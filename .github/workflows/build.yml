@@ -34,7 +34,7 @@ jobs:
           pkg --targets node18-${{ matrix.os }} -o build/lynx-${{ matrix.os }} ./build/lib/index.js
 
   push-builds:
-    needs: [build]
+    needs: [ build ]
     runs-on: ubuntu-latest
 
     steps:
@@ -46,19 +46,8 @@ jobs:
           git config --global user.name "Lynx Bot"
           git config --global user.email "info@getlynx.dev"
 
-      - name: Get package version
-        id: get-version
-        run: echo ::set-output name=version::$(node -e "console.log(require('./package.json').version)")
-
-      - name: Create versioned directory if not exists
-        run: mkdir -p build/${{ steps.get-version.outputs.version }}
-
-      - name: Move built binaries to versioned directory
-        run: |
-          mv build/lynx-* build/${{ steps.get-version.outputs.version }}/ || true
-
-      - name: Commit and push versioned binaries
-        run: |
-          git add build/
-          git commit -m "Add versioned binaries for ${{ steps.get-version.outputs.version }}"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
