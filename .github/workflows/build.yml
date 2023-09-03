@@ -32,3 +32,23 @@ jobs:
         run: |
           ncc build -o build/lib ./index.js
           pkg --targets node18-${{ matrix.os }} -o build/lynx-${{ matrix.os }} ./build/lib/index.js
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "Your Name"
+          git config --global user.email "youremail@example.com"
+
+      - name: Get package version
+        id: get-version
+        run: echo ::set-output name=version::$(node -e "console.log(require('./package.json').version)")
+
+      - name: Move built binaries to versioned directory
+        run: |
+          mkdir -p build/${{ steps.get-version.outputs.version }}
+          mv build/lynx-* build/${{ steps.get-version.outputs.version }}/
+
+      - name: Commit and push versioned binaries
+        run: |
+          git add build/
+          git commit -m "Add versioned binaries for ${{ steps.get-version.outputs.version }}"
+          git push
