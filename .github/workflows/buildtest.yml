@@ -1,0 +1,53 @@
+name: Build Lynx
+
+on:
+  push:
+    branches:
+      - dev # You can change this to your main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [macos-x64, windows-x64, linux-x64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18 # Adjust the Node.js version if needed (18 preferred)
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install ncc and pkg
+        run: npm install -g @vercel/ncc pkg
+
+      - name: Build Lynx for ${{ matrix.os }}
+        run: |
+          ncc build -o build/lib ./index.js
+          pkg --targets node18-${{ matrix.os }} -o build/lynx-${{ matrix.os }} ./build/lib/index.js
+
+  push-builds:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "Lynx Bot"
+          git config --global user.email "info@getlynx.dev"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
